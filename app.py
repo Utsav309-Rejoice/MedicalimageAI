@@ -65,3 +65,10 @@ def main():
             
             st.subheader("Analysis Result")
             st.write(analysis)
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        st.error(f"Critical error: {e}")
+        st.error(traceback.format_exc())
