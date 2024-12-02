@@ -7,10 +7,7 @@ import io
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 def encode_image(image):
-    img_byte_arr = io.BytesIO()
-    image.save(img_byte_arr, format=image.format)
-    img_byte_arr = img_byte_arr.getvalue()
-    return img_byte_arr
+    return base64.b64encode(image_file.read()).decode('utf-8')
 
 
 def analyze_image(image):
