@@ -14,7 +14,7 @@ def encode_image(image):
 
 
 def analyze_image(image):
-    base_image = encode_image(image)
+    base64_image = encode_image(image)
     prompt = """
     As a professional role-playing as a Dermatologist of superior expertise in the field of dermatology, your task is to conduct a comprehensive, informed, and accurate examination of a provided image of a skin condition. Your examination should leverage your extensive knowledge in the subject matter, your ability to identify and analyze visual patterns, and your understanding of how these relate to skin diseases.
 First, analyze the provided image in detail. Identify key characteristics such as any visible changes in the skin texture, color, shape or size of any abnormalities, hardness or softness, presence of any rashes, sores, or lesions, or any other notable marks or signs. Next, document these observations, keeping in mind that this documentation will be used to support your ultimate diagnosis.
@@ -29,22 +29,27 @@ Diagnosed diseases:
 Important Clinical Context:
 Treatment Plan: 
 """
-    response = client.chat.completions.create(
-    model="gpt-4o-mini",
+    base64_image = encode_image(image_path)
+    response = openai.chat.completions.create(
+    model="gpt-4o",
     messages=[
+    {
+      "role": "user",
+      "content": [
         {
-            "role": "user",
-            "content": [
-                {"type": "text", "text": prompt},
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"{img_url}"},
-                },
-            ],
-        }
-    ],
-    )  
-    
+          "type": "text",
+          "text": prompt,
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url":  f"data:image/jpeg;base64,{base64_image}"
+          },
+        },
+      ],
+    }
+  ],
+)
     
     print(response.choices[0].message.content)
     return response.choices[0].message.content
