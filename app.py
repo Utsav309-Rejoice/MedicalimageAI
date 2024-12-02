@@ -71,4 +71,3 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         st.error(f"Critical error: {e}")
-        st.error(traceback.format_exc())
