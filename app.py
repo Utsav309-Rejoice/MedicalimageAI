@@ -7,17 +7,26 @@ import io
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 def encode_image(image):
-    img_byte_arr = io.BytesIO()
-    image.save(img_byte_arr, format=image.format)
-    img_byte_arr = img_byte_arr.getvalue()
-    
-    return base64.b64encode(img_byte_arr).decode('utf-8')
+    try:
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        
+        image.thumbnail((1024, 1024))
+        
+        img_byte_arr = io.BytesIO()
+        image.save(img_byte_arr, format='JPEG')
+        img_byte_arr = img_byte_arr.getvalue()
+        
+        return base64.b64encode(img_byte_arr).decode('utf-8')
+    except Exception as e:
+        st.error(f"Error encoding image: {e}")
+        return None
 
 
 def analyze_image(image):
     base_image = encode_image(image)
     response = openai.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-4",
     messages=[
     {
       "role": "user",
