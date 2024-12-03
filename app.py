@@ -56,10 +56,10 @@ def main():
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
+        image = image.convert("RGB")
         st.image(image, caption="Uploaded Image", use_column_width=True)
         temp_image_path = "uploaded_image.png"
-        with open(temp_image_path, "wb") as f:
-            f.write(uploaded_file.read())
+        image.save(temp_image_path,format="PNG")
         if st.button("Analyze Image"):
             with st.spinner("Analyzing image..."):
                 analysis = analyze_image(temp_image_path)
