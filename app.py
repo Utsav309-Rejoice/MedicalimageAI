@@ -6,12 +6,12 @@ import io
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-def encode_image(image):
-    return base64.b64encode(image.read()).decode('utf-8')
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
 
-
-def analyze_image(image):
-    base64_image = encode_image(image)
+def analyze_image(image_path):
+    base64_image = encode_image(image_path)
     prompt = """
     As a professional role-playing as a Dermatologist of superior expertise in the field of dermatology, your task is to conduct a comprehensive, informed, and accurate examination of a provided image of a skin condition. Your examination should leverage your extensive knowledge in the subject matter, your ability to identify and analyze visual patterns, and your understanding of how these relate to skin diseases.
 First, analyze the provided image in detail. Identify key characteristics such as any visible changes in the skin texture, color, shape or size of any abnormalities, hardness or softness, presence of any rashes, sores, or lesions, or any other notable marks or signs. Next, document these observations, keeping in mind that this documentation will be used to support your ultimate diagnosis.
@@ -57,10 +57,12 @@ def main():
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         st.image(image, caption="Uploaded Image", use_column_width=True)
-        
+        temp_image_path = "uploaded_image.png"
+        with open(temp_image_path, "wb") as f:
+            f.write(uploaded_file.read())
         if st.button("Analyze Image"):
             with st.spinner("Analyzing image..."):
-                analysis = analyze_image(uploaded_file)
+                analysis = analyze_image(temp_image_path)
             
             st.subheader("Analysis Result")
             st.write(analysis)
