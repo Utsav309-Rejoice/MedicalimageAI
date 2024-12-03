@@ -26,7 +26,6 @@ Diagnosed diseases:
 Important Clinical Context:
 Treatment Plan: 
 """
-    base64_image = encode_image(image_path)
     response = openai.chat.completions.create(
     model="gpt-4o",
     messages=[
