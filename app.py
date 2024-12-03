@@ -59,7 +59,7 @@ def main():
         image = image.convert("RGB")
         st.image(image, caption="Uploaded Image", use_column_width=True)
         temp_image_path = "uploaded_image.png"
-        image.save(temp_image_path,format="PNG")
+        image.save(temp_image_path,format="JPEG")
         if st.button("Analyze Image"):
             with st.spinner("Analyzing image..."):
                 analysis = analyze_image(temp_image_path)
