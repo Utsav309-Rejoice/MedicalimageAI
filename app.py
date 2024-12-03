@@ -61,7 +61,7 @@ def main():
         
         if st.button("Analyze Image"):
             with st.spinner("Analyzing image..."):
-                analysis = analyze_image(image)
+                analysis = analyze_image(uploaded_file)
             
             st.subheader("Analysis Result")
             st.write(analysis)
