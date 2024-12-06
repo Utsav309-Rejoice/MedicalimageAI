@@ -106,7 +106,7 @@ Paramount Reminder: This analysis may significantly impact patient treatment and
               ]
             }],
             model="claude-3-opus-20240229")
-  return response.content[0].text
+    return response.content[0].text
 
 def analyze_image(image_path):
     base64_image = encode_image(image_path)
