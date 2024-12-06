@@ -154,16 +154,14 @@ def main():
     medical_history = st.text_area(
     label="Patient Medical History", 
     placeholder="Enter comprehensive medical history details...",
-    height=200,
-    key="medical_history_input"
+    height=200
     )
 
     # Disease Symptoms Text Input
     disease_symptoms = st.text_area(
     label="Patient-Reported Disease Symptoms", 
     placeholder="Describe specific symptoms experienced by the patient...",
-    height=200,
-    key="disease_symptoms_input"
+    height=200
     )
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
@@ -174,7 +172,7 @@ def main():
         image.save(temp_image_path,format="JPEG")
         if st.button("Analyze Image"):
             with st.spinner("Analyzing image..."):
-                analysis = claude_question(temp_image_path,st.session_state.medical_history_input,st.session_state.disease_symptoms_input)
+                analysis = claude_question(temp_image_path,medical_history,disease_symptoms)
             
             st.subheader("Analysis Result")
             st.write(analysis)
