@@ -131,8 +131,6 @@ Return ONLY the text content of the {{section}} section, exactly as it appears i
           },
         },
       ],
-    }
-  ],
 )
     return section_content.choices[0].message.content
 def analyze_image(image_path):
