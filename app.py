@@ -73,7 +73,6 @@ Contextual Insights from Medical History: [How history influences diagnostic con
 Correlation of Symptoms with Visual Findings: [Detailed analysis of symptom-image relationships]
 Diagnosed Diseases: [Potential conditions with probability assessment]
 Treatment Plan: [Recommended approach, potential interventions]
-Note: All the titles such as Visual Image Analysis, Comprehensive Context Integration,Diagnostic Methodology and Diagnostic Reasoning are to be written in BOLD. But the content of these titles should NOT be in BOLD. 
 Critical Guidance:
 - Ensure unparalleled accuracy and precision
 - Communicate complex medical information with clarity
@@ -99,7 +98,43 @@ Put your current analysis and thoughts into the response keeping in mind that th
             }],
             model="claude-3-opus-20240229")
     return response.content[0].text
+def get_section(section,results):
+    prompt = f"""Extract ONLY the {{section}} section from the given medical analysis result.
+Input: {{results}}
+Task:
 
+Locate the "{{section}}:" section in the text
+Extract ONLY the content following "{{section}}:"
+Do NOT include any other sections
+Preserve the exact original text of the {{section}} section
+
+Output:
+Return ONLY the text content of the {{section}} section, exactly as it appears in the original document."""
+    section_content = openai.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": prompt.format(section=section,results=results),
+        },
+        {
+          "type": "text",
+          "text": section,
+          },
+          
+        {
+          "type": "text",
+          "text": results,
+          },
+        },
+      ],
+    }
+  ],
+)
+    return section_content.choices[0].message.content
 def analyze_image(image_path):
     base64_image = encode_image(image_path)
     prompt = """
@@ -165,9 +200,12 @@ def main():
         if st.button("Analyze Image"):
             with st.spinner("Analyzing image..."):
                 analysis = claude_question(temp_image_path,medical_history,disease_symptoms)
+                visual_findings = get_section("Visual Findings",analysis)
             
             st.subheader("Analysis Result")
             st.write(analysis)
+            st.subheader("Visual Findings")
+            st.write(visual_findings)
 
 if __name__ == "__main__":
     try:
