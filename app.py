@@ -78,7 +78,7 @@ Critical Guidance:
 - Ensure unparalleled accuracy and precision
 - Communicate complex medical information with clarity
 - Provide insights that could potentially guide comprehensive patient care
-Paramount Reminder: This analysis may significantly impact patient treatment and well-being. Approach the examination with the most rigorous scientific expertise, clinical acumen, and compassionate professionalism."""
+"""
     base_image = encode_image(image_path)
     response = anthropic_client.messages.create(max_tokens=1024,
     messages=[{
