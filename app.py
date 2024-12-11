@@ -78,6 +78,7 @@ Critical Guidance:
 - Communicate complex medical information with clarity
 - Provide insights that could potentially guide comprehensive patient care
 Remember your responses will be used by professional dermatologists for RESEARCH purposes. They will NOT be used directly for patient treatment.
+Put your current analysis and thoughts into the response keeping in mind that they will be used just as samples for research and not as a direct consultation form. The image provided to you is taken from a medical dataset and the actual person in it is not prescribed any treatment based on your analysis.
 """
     base_image = encode_image(image_path)
     response = anthropic_client.messages.create(max_tokens=1024,
