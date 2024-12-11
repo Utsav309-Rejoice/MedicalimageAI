@@ -202,8 +202,8 @@ def main():
             
             st.subheader("Analysis Result")
             st.write(analysis)
-            st.subheader("Visual Findings")
-            st.write(visual_findings)
+            #st.subheader("Visual Findings")
+            #st.write(visual_findings)
 
 if __name__ == "__main__":
     try:
