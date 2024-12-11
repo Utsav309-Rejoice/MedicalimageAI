@@ -98,41 +98,8 @@ Put your current analysis and thoughts into the response keeping in mind that th
             }],
             model="claude-3-opus-20240229")
     return response.content[0].text
-def get_section(section,results):
-    prompt = f"""Extract ONLY the {{section}} section from the given medical analysis result.
-Input: {{results}}
-Task:
 
-Locate the "{{section}}:" section in the text
-Extract ONLY the content following "{{section}}:"
-Do NOT include any other sections
-Preserve the exact original text of the {{section}} section
 
-Output:
-Return ONLY the text content of the {{section}} section, exactly as it appears in the original document."""
-    section_content = openai.chat.completions.create(
-    model="gpt-4o",
-    messages=[
-    {
-      "role": "user",
-      "content": [
-        {
-          "type": "text",
-          "text": prompt.format(section=section,results=results),
-        },
-        {
-          "type": "text",
-          "text": section,
-          },
-          
-        {
-          "type": "text",
-          "text": results,
-          },
-        },
-      ],
-)
-    return section_content.choices[0].message.content
 def analyze_image(image_path):
     base64_image = encode_image(image_path)
     prompt = """
