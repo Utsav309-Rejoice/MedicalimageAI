@@ -73,6 +73,7 @@ Contextual Insights from Medical History: [How history influences diagnostic con
 Correlation of Symptoms with Visual Findings: [Detailed analysis of symptom-image relationships]
 Diagnosed Diseases: [Potential conditions with probability assessment]
 Treatment Plan: [Recommended approach, potential interventions]
+Note: All the titles such as Visual Image Analysis, Comprehensive Context Integration,Diagnostic Methodology and Diagnostic Reasoning are to be written in BOLD. But the content of these titles should NOT be in BOLD. 
 Critical Guidance:
 - Ensure unparalleled accuracy and precision
 - Communicate complex medical information with clarity
