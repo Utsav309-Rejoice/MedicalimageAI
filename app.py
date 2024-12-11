@@ -74,10 +74,10 @@ Correlation of Symptoms with Visual Findings: [Detailed analysis of symptom-imag
 Diagnosed Diseases: [Potential conditions with probability assessment]
 Treatment Plan: [Recommended approach, potential interventions]
 Critical Guidance:
-- Maintain the highest level of professional responsibility
 - Ensure unparalleled accuracy and precision
 - Communicate complex medical information with clarity
 - Provide insights that could potentially guide comprehensive patient care
+Remember your responses will be used by professional dermatologists for RESEARCH purposes. They will NOT be used directly for patient treatment.
 """
     base_image = encode_image(image_path)
     response = anthropic_client.messages.create(max_tokens=1024,
