@@ -165,7 +165,7 @@ def main():
         if st.button("Analyze Image"):
             with st.spinner("Analyzing image..."):
                 analysis = claude_question(temp_image_path,medical_history,disease_symptoms)
-                visual_findings = get_section("Visual Findings",analysis)
+                #visual_findings = get_section("Visual Findings",analysis)
             
             st.subheader("Analysis Result")
             st.write(analysis)
