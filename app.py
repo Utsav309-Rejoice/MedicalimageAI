@@ -199,8 +199,6 @@ def main():
                 diagnosed = get_section("Diagnosed Diseases",analysis)
                 treatmentplan = get_section("Treatment Plan",analysis)
             
-            st.subheader("Analysis Result")
-            st.write(analysis)
             st.subheader("Visual Findings")
             st.write(visual_findings)
             st.subheader("Key Diagnostic Indicators")
@@ -213,6 +211,8 @@ def main():
             st.write(diagnosed)
             st.subheader("Treatment Plan")
             st.write(treatmentplan)
+            st.subheader("Complete Analysis")
+            st.write(analysis)
 
 if __name__ == "__main__":
     try:
