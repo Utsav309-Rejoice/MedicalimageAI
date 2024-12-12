@@ -193,11 +193,26 @@ def main():
             with st.spinner("Analyzing image..."):
                 analysis = claude_question(temp_image_path,medical_history,disease_symptoms)
                 visual_findings = get_section("Visual Findings",analysis)
+                key_diagnostic = get_section("Key Diagnostic Indicators",analysis)
+                med_history = get_section("Contextual Insights from Medical History",analysis)
+                corr_symptoms = get_section("Correlation of Symptoms with Visual Findings",analysis)
+                diagnosed = get_section("Diagnosed Diseases",analysis)
+                treatmentplan = get_section("Treatment Plan",analysis)
             
             st.subheader("Analysis Result")
             st.write(analysis)
             st.subheader("Visual Findings")
             st.write(visual_findings)
+            st.subheader("Key Diagnostic Indicators")
+            st.write(key_diagnostic)
+            st.subheader("Contextual Insights from Medical History")
+            st.write(med_history)
+            st.subheader("Correlation of Symptoms with Visual Findings")
+            st.write(corr_symptoms)
+            st.subheader("Diagnosed Diseases")
+            st.write(diagnosed)
+            st.subheader("Treatment Plan")
+            st.write(treatmentplan)
 
 if __name__ == "__main__":
     try:
