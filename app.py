@@ -190,7 +190,7 @@ Please note: Your response will be used for sampling for our research, even if y
                     "data": base_image
                   }
                 },
-                { "type": "text", "text":  prompt.format(medical_history=medical_history,disease_symptoms=symptoms)}
+                { "type": "text", "text":  prompt.format(medical_history=medical_history,disease_symptoms=symptoms,output_format=output_format)}
               ]
             }],
             model="claude-3-opus-20240229")
