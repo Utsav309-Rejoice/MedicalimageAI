@@ -77,7 +77,8 @@ def extract_section(parsed_response, section_title):
     
     # Return the section content if the key exists
     if internal_key in parsed_response:
-        return parsed_response[internal_key]
+        
+        return get_section(internal_key,parsed_response)
     return get_section(internal_key,parsed_response) 
 
 def claude_question(image_path,medical_history,symptoms):
