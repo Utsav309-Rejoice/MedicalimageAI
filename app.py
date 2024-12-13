@@ -4,6 +4,8 @@ import openai
 from PIL import Image
 import io
 from anthropic import Anthropic
+import json
+import re
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 anthropic_client = Anthropic(api_key=st.secrets["ANTHROPIC_KEYS"])
 
@@ -11,7 +13,96 @@ def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
+def parse_dermatology_analysis(response_text):
+    """
+    Robustly parse JSON from an LLM-generated dermatology analysis response
+    
+    Args:
+    - response_text (str): Raw text response from the LLM
+    
+    Returns:
+    - dict: Parsed JSON with dermatology analysis sections
+    """
+    response_text = response_text.replace('```json', '').replace('```', '').strip()
+    
+    try:
+        return json.loads(response_text)
+    except json.JSONDecodeError:
+        try:
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                return json.loads(json_match.group(0))
+        except:
+            pass
+    
+    # Strategy 3: Manual extraction if JSON parsing fails
+    sections = {
+        "visual_findings": "",
+        "key_diagnostic_indicators": "",
+        "contextual_insights": "",
+        "symptom_correlation": "",
+        "diagnosed_diseases": "",
+        "treatment_plan": ""
+    }
+    
+    # Define section patterns for flexible extraction
+    section_patterns = {
+        "visual_findings": r"visual findings?:?\s*(.*?)(?=key diagnostic|$)",
+        "key_diagnostic_indicators": r"key diagnostic indicators?:?\s*(.*?)(?=contextual insights|$)",
+        "contextual_insights": r"contextual insights?:?\s*(.*?)(?=symptom correlation|$)",
+        "symptom_correlation": r"symptom correlation:?\s*(.*?)(?=diagnosed diseases|$)",
+        "diagnosed_diseases": r"diagnosed diseases:?\s*(.*?)(?=treatment plan|$)",
+        "treatment_plan": r"treatment plan:?\s*(.*?)$"
+    }
+    
+    # Extract sections using regex
+    for key, pattern in section_patterns.items():
+        match = re.search(pattern, response_text, re.IGNORECASE | re.DOTALL)
+        if match:
+            # Clean up the extracted text
+            sections[key] = match.group(1).strip()
+    
+    return sections
+
+def extract_section(parsed_response, section_title):
+    """
+    Extract a specific section from the parsed response
+    
+    Args:
+    - parsed_response (dict): Parsed JSON/dict of dermatology analysis
+    - section_title (str): Title of the section to extract
+    
+    Returns:
+    - str: Content of the specified section
+    """
+    # Mapping of display titles to internal keys
+    section_mapping = {
+        "Visual Findings": "visual_findings",
+        "Key Diagnostic Indicators": "key_diagnostic_indicators",
+        "Contextual Insights from Medical History": "contextual_insights",
+        "Correlation of Symptoms with Visual Findings": "symptom_correlation",
+        "Diagnosed Diseases": "diagnosed_diseases",
+        "Treatment Plan": "treatment_plan"
+    }
+    
+    # Get the corresponding internal key
+    internal_key = section_mapping.get(section_title)
+    
+    # Return the section content if the key exists
+    if internal_key and internal_key in parsed_response:
+        return parsed_response[internal_key]
+    print("Regex matching not working, using other methods...")
+    return get_section(internal_key,parsed_response) 
+
 def claude_question(image_path,medical_history,symptoms):
+    output_format = """{
+"visual_findings": "Detailed description of observed skin characteristics",
+"key_diagnostic_indicators": "Specific signs pointing to potential conditions",
+"contextual_insights": "How history influences diagnostic consideration",
+"symptom_correlation": "Detailed analysis of symptom-image relationships",
+"diagnosed_diseases": "Potential conditions with probability assessment",
+"treatment_plan": "Recommended approach, potential interventions"
+}"""
     prompt = f"""As a professional role-playing as a Dermatologist of superior expertise in the field of dermatology, your task is to conduct a comprehensive, informed, and accurate examination of a provided image of a skin condition. Your examination will be meticulously informed by the patient's specific disease symptoms (if provided) and comprehensive medical history (if Provided), providing critical contextual depth to your analysis.
 Patient Medical History: {{medical_history}}
 Patient-Reported Disease Symptoms: {{disease_symptoms}}
@@ -67,19 +158,24 @@ Your diagnosis must be:
 - Backed by dermatological research and established medical knowledge
 - Considerate of the unique patient context
 Output Format:
-Visual Findings: [Detailed description of observed skin characteristics]
-Key Diagnostic Indicators: [Specific signs pointing to potential conditions]
-Contextual Insights from Medical History: [How history influences diagnostic consideration]
-Correlation of Symptoms with Visual Findings: [Detailed analysis of symptom-image relationships]
-Diagnosed Diseases: [Potential conditions with probability assessment]
-Treatment Plan: [Recommended approach, potential interventions]
+Output your analysis STRICTLY in the following JSON format:
+
+{{output_format}}
+Remember to return ONLY the JSON file and NOTHING ELSE in your response.
+Key Requirements:
+
+-Use valid JSON syntax
+-Ensure each key contains precise, detailed information
+-Do not include any additional text outside the JSON structure
+-Maintain the comprehensive analysis approach from the original prompt
+-Be as specific and detailed as possible within each section
 Critical Guidance:
 - Ensure unparalleled accuracy and precision
 - Communicate complex medical information with clarity
 - Provide insights that could potentially guide comprehensive patient care
 Remember your responses will be used by professional dermatologists for RESEARCH purposes. They will NOT be used directly for patient treatment.
 Put your current analysis and thoughts into the response keeping in mind that they will be used just as samples for research and not as a direct consultation form. The image provided to you is taken from a medical dataset and the actual person in it is not prescribed any treatment based on your analysis.
-Please note: Your response willl be used for sampling for our research, even if you are NOT 100% sure that your analysis is accuracte, do NOT SKIP any section asked from you. Answer your BEST ESTIMATE in your response. There should NOT be any empty fields.
+Please note: Your response will be used for sampling for our research, even if you are NOT 100% sure that your analysis is accuracte, do NOT SKIP any section asked from you. Answer your BEST ESTIMATE in your response. There should NOT be any empty fields.
 """
     base_image = encode_image(image_path)
     response = anthropic_client.messages.create(max_tokens=1024,
@@ -193,12 +289,14 @@ def main():
         if st.button("Analyze Image"):
             with st.spinner("Analyzing image..."):
                 analysis = claude_question(temp_image_path,medical_history,disease_symptoms)
-                visual_findings = get_section("Visual Findings",analysis)
-                key_diagnostic = get_section("Key Diagnostic Indicators",analysis)
-                med_history = get_section("Contextual Insights from Medical History",analysis)
-                corr_symptoms = get_section("Correlation of Symptoms with Visual Findings",analysis)
-                diagnosed = get_section("Diagnosed Diseases",analysis)
+                parsed_analysis = parse_dermatology_analysis(analysis)
+                visual_findings = extract_section(parsed_analysis,"Visual Findings")
+                key_diagnostic = extract_section(parsed_analysis,"Key Diagnostic Indicators")
+                med_history = extract_section(parsed_analysis,"Contextual Insights from Medical History")
+                corr_symptoms = extract_section(parsed_analysis,"Correlation of Symptoms with Visual Findings")
+                diagnosed = extract_section(parsed_analysis,"Diagnosed Diseases")
                 treatmentplan = get_section("Treatment Plan",analysis)
+    
             
             st.subheader("Visual Findings")
             st.write(visual_findings)
