@@ -77,8 +77,12 @@ def extract_section(parsed_response, section_title):
     
     # Return the section content if the key exists
     if internal_key in parsed_response:
-        
-        return get_section(parsed_response,internal_key)
+        section_parsed = json.loads(repair_json(parsed_response)).get(internal_key)
+        if section_parsed is not None and section_parsed != "":
+            print("returning section of json")
+            return section_parsed
+        else:
+            return get_section(parsed_response,internal_key)
     return get_section(parsed_response,internal_key) 
 
 def claude_question(image_path,medical_history,symptoms):
