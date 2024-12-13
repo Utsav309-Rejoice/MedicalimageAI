@@ -295,7 +295,7 @@ def main():
                 med_history = extract_section(parsed_analysis,"Contextual Insights from Medical History")
                 corr_symptoms = extract_section(parsed_analysis,"Correlation of Symptoms with Visual Findings")
                 diagnosed = extract_section(parsed_analysis,"Diagnosed Diseases")
-                treatmentplan = get_section("Treatment Plan",analysis)
+                treatmentplan = extract_section(parsed_analysis,"Treatment Plan")
     
             
             st.subheader("Visual Findings")
