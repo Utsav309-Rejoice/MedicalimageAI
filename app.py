@@ -277,12 +277,12 @@ def main():
             with st.spinner("Analyzing image..."):
                 analysis = claude_question(temp_image_path,medical_history,disease_symptoms)
                 parsed_analysis = parse_dermatology_analysis(analysis)
-                visual_findings = extract_section(parsed_analysis,"Visual Findings")
-                key_diagnostic = extract_section(parsed_analysis,"Key Diagnostic Indicators")
-                med_history = extract_section(parsed_analysis,"Contextual Insights from Medical History")
-                corr_symptoms = extract_section(parsed_analysis,"Correlation of Symptoms with Visual Findings")
-                diagnosed = extract_section(parsed_analysis,"Diagnosed Diseases")
-                treatmentplan = extract_section(parsed_analysis,"Treatment Plan")
+                visual_findings = extract_section(analysis,"Visual Findings")
+                key_diagnostic = extract_section(analysis,"Key Diagnostic Indicators")
+                med_history = extract_section(analysis,"Contextual Insights from Medical History")
+                corr_symptoms = extract_section(analysis,"Correlation of Symptoms with Visual Findings")
+                diagnosed = extract_section(analysis,"Diagnosed Diseases")
+                treatmentplan = extract_section(analysis,"Treatment Plan")
     
             
             st.subheader("Visual Findings")
