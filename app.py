@@ -12,7 +12,7 @@ anthropic_client = Anthropic(api_key=st.secrets["ANTHROPIC_KEYS"])
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
-
+        
 def parse_dermatology_analysis(response_text):
     """
     Robustly parse JSON from an LLM-generated dermatology analysis response
@@ -23,20 +23,25 @@ def parse_dermatology_analysis(response_text):
     Returns:
     - dict: Parsed JSON with dermatology analysis sections
     """
+    # Remove any surrounding text or code block markers
     response_text = response_text.replace('```json', '').replace('```', '').strip()
     
+    # Try multiple parsing strategies
     try:
-        return json.loads(response_text)
+        # Strategy 1: Direct JSON parsing
+        parsed_response = json.loads(response_text)
+        return parsed_response
     except json.JSONDecodeError:
+        # Strategy 2: Extract JSON between first { and last }
         try:
-            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL | re.MULTILINE)
             if json_match:
                 return json.loads(json_match.group(0))
-        except:
-            pass
+        except Exception as e:
+            print(f"JSON parsing error: {e}")
     
-    # Strategy 3: Manual extraction if JSON parsing fails
-    sections = {
+    # If all parsing fails, return empty dictionary
+    return {
         "visual_findings": "",
         "key_diagnostic_indicators": "",
         "contextual_insights": "",
@@ -44,25 +49,7 @@ def parse_dermatology_analysis(response_text):
         "diagnosed_diseases": "",
         "treatment_plan": ""
     }
-    
-    # Define section patterns for flexible extraction
-    section_patterns = {
-        "visual_findings": r"visual findings?:?\s*(.*?)(?=key diagnostic|$)",
-        "key_diagnostic_indicators": r"key diagnostic indicators?:?\s*(.*?)(?=contextual insights|$)",
-        "contextual_insights": r"contextual insights?:?\s*(.*?)(?=symptom correlation|$)",
-        "symptom_correlation": r"symptom correlation:?\s*(.*?)(?=diagnosed diseases|$)",
-        "diagnosed_diseases": r"diagnosed diseases:?\s*(.*?)(?=treatment plan|$)",
-        "treatment_plan": r"treatment plan:?\s*(.*?)$"
-    }
-    
-    # Extract sections using regex
-    for key, pattern in section_patterns.items():
-        match = re.search(pattern, response_text, re.IGNORECASE | re.DOTALL)
-        if match:
-            # Clean up the extracted text
-            sections[key] = match.group(1).strip()
-    
-    return sections
+
 
 def extract_section(parsed_response, section_title):
     """
@@ -89,9 +76,8 @@ def extract_section(parsed_response, section_title):
     internal_key = section_mapping.get(section_title)
     
     # Return the section content if the key exists
-    if internal_key and internal_key in parsed_response:
+    if internal_key in parsed_response:
         return parsed_response[internal_key]
-    print("Regex matching not working, using other methods...")
     return get_section(internal_key,parsed_response) 
 
 def claude_question(image_path,medical_history,symptoms):
