@@ -7,6 +7,8 @@ from anthropic import Anthropic
 import json
 import re
 from json_repair import repair_json
+import cv2
+import numpy as np
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 anthropic_client = Anthropic(api_key=st.secrets["ANTHROPIC_KEYS"])
 
